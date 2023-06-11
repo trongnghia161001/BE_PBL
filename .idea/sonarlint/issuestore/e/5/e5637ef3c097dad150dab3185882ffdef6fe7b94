@@ -1,0 +1,5 @@
+
+g	java:S116"RRename this field "user_id" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(„¡Ü
+o	java:S116"URename this field "product_id" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÀÅÛÏøÿÿÿÿ
+o	java:S116""URename this field "created_at" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(±“¡ıüÿÿÿÿ
+j	java:S116$"URename this field "updated_at" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ğüı

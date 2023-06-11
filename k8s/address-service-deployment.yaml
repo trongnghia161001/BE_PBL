@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: address-service-app
+spec:
+  selector:
+    matchLabels:
+      app: address-service-app
+  template:
+    metadata:
+      labels:
+        app: address-service-app
+    spec:
+      containers:
+        - name: address-service-app
+          image: trongnghia161001/addressservice
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9039
+          env:
+            - name: AXONSERVER_ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  name: axonserver-config
+                  key: axon.axonserver.domain
+            - name: CONFIG_SERVER_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: config-cm
+                  key: config_url
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: mysql-cm
+                  key: hostname
+                  optional: true
+            - name: EUREKA_SERVER_ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  name: eureka-cm
+                  key: eureka_service_address
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: address-service-svc
+spec:
+  selector:
+    app: address-service-app
+  ports:
+    - port: 80
+      targetPort: 9039

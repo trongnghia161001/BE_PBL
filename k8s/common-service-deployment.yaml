@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: common-service-app
+spec:
+  selector:
+    matchLabels:
+      app: common-service-app
+  template:
+    metadata:
+      labels:
+        app: common-service-app
+    spec:
+      containers:
+        - name: common-service-app
+          image: trongnghia161001/commonservice
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9051
+          env:
+            - name: CONFIG_SERVER_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: config-cm
+                  key: config_url
+            - name: EUREKA_SERVER_ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  name: eureka-cm
+                  key: eureka_service_address
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: common-service-svc
+spec:
+  selector:
+    app: common-service-app
+  ports:
+    - port: 80
+      targetPort: 9051

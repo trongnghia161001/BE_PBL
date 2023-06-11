@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="billservice" />
+        <module name="detailbillservice" />
+        <module name="publisherservice" />
+        <module name="billpromotionservice" />
+        <module name="ratingsservice" />
+        <module name="contactsservice" />
+        <module name="shippingmethodservice" />
+        <module name="productspromotionsservice" />
+        <module name="author-service" />
+        <module name="shippingservice" />
+        <module name="addressservice" />
+        <module name="menuservice" />
+        <module name="passwordresetsservice" />
+        <module name="paymentmethodservice" />
+        <module name="PBL5_BOOKSTORE" />
+        <module name="categoriesservice" />
+        <module name="promotionsservice" />
+        <module name="userpromotionservice" />
+        <module name="ConfigServer" />
+        <module name="shoppingcartservice" />
+        <module name="commonservice" />
+        <module name="articlesservice" />
+        <module name="attributesservice" />
+        <module name="productimagesservice" />
+        <module name="staticsservice" />
+        <module name="provinceservice" />
+        <module name="slidesservice" />
+        <module name="paymentsservice" />
+        <module name="usersservice" />
+        <module name="shippingpromotionservice" />
+        <module name="commentsservice" />
+        <module name="productskeywordsservice" />
+        <module name="discoveryserver" />
+        <module name="historytransactionservice" />
+        <module name="adminsservice" />
+        <module name="managewarehouseservice" />
+        <module name="apigateway" />
+        <module name="productsattributesservice" />
+        <module name="userfavouriteservice" />
+        <module name="billshippingservice" />
+        <module name="eventsservice" />
+        <module name="warehouseservice" />
+        <module name="keywordsservice" />
+        <module name="productservice" />
+        <module name="producttypeservice" />
+        <module name="carrierservice" />
+        <module name="notificationservice" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel target="17">
+      <module name="authorservice" target="17" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="ConfigServer" options="-parameters" />
+      <module name="addressservice" options="-parameters" />
+      <module name="adminsservice" options="-parameters" />
+      <module name="apigateway" options="-parameters" />
+      <module name="articlesservice" options="-parameters" />
+      <module name="attributesservice" options="-parameters" />
+      <module name="author-service" options="-parameters" />
+      <module name="authorservice" options="-parameters" />
+      <module name="billpromotionservice" options="-parameters" />
+      <module name="billservice" options="-parameters" />
+      <module name="billshippingservice" options="-parameters" />
+      <module name="carrierservice" options="-parameters" />
+      <module name="categoriesservice" options="-parameters" />
+      <module name="commentsservice" options="-parameters" />
+      <module name="commonservice" options="-parameters" />
+      <module name="contactsservice" options="-parameters" />
+      <module name="detailbillservice" options="-parameters" />
+      <module name="discoveryserver" options="-parameters" />
+      <module name="eventsservice" options="-parameters" />
+      <module name="historytransactionservice" options="-parameters" />
+      <module name="keywordsservice" options="-parameters" />
+      <module name="managewarehouseservice" options="-parameters" />
+      <module name="menuservice" options="-parameters" />
+      <module name="notificationservice" options="-parameters" />
+      <module name="passwordresetsservice" options="-parameters" />
+      <module name="paymentmethodservice" options="-parameters" />
+      <module name="paymentsservice" options="-parameters" />
+      <module name="productimagesservice" options="-parameters" />
+      <module name="productsattributesservice" options="-parameters" />
+      <module name="productservice" options="-parameters" />
+      <module name="productskeywordsservice" options="-parameters" />
+      <module name="productspromotionsservice" options="-parameters" />
+      <module name="producttypeservice" options="-parameters" />
+      <module name="promotionsservice" options="-parameters" />
+      <module name="provinceservice" options="-parameters" />
+      <module name="publisherservice" options="-parameters" />
+      <module name="ratingsservice" options="-parameters" />
+      <module name="shippingmethodservice" options="-parameters" />
+      <module name="shippingpromotionservice" options="-parameters" />
+      <module name="shippingservice" options="-parameters" />
+      <module name="shoppingcartservice" options="-parameters" />
+      <module name="slidesservice" options="-parameters" />
+      <module name="staticsservice" options="-parameters" />
+      <module name="userfavouriteservice" options="-parameters" />
+      <module name="userpromotionservice" options="-parameters" />
+      <module name="usersservice" options="-parameters" />
+      <module name="warehouseservice" options="-parameters" />
+    </option>
+  </component>
+</project>

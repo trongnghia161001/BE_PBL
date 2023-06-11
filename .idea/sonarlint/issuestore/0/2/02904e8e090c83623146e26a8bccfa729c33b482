@@ -1,0 +1,27 @@
+
+F
+java:S1068"*Remove this unused "userId" private field.(íÃË8¤çÇŠ1
+L
+java:S1068"*Remove this unused "billId" private field.(†Ëÿÿşÿÿÿÿ8¦çÇŠ1
+R
+java:S1068"0Remove this unused "shippingDate" private field.(ôù’ùÿÿÿÿ8§çÇŠ1
+V
+java:S1068"9Remove this unused "estimatedDeliveryDate" private field.(Ú•ñÏ8¨çÇŠ1
+S
+java:S1068 "6Remove this unused "actualDeliveryDate" private field.(©Ä€8©çÇŠ1
+O
+java:S1068""2Remove this unused "shippingMethod" private field.(ÿ®ç8ªçÇŠ1
+N
+java:S1068$"2Remove this unused "trackingNumber" private field.(â¥ƒ\8«çÇŠ1
+J
+java:S1068&"-Remove this unused "carrierId" private field.(…üĞÏ8®çÇŠ1
+L
+java:S1068("*Remove this unused "status" private field.(¦­œ˜ÿÿÿÿÿ8¯çÇŠ1
+R
+java:S1068*"0Remove this unused "shipmentCost" private field.(Âºğûÿÿÿÿ8°çÇŠ1
+J
+java:S1068,"(Remove this unused "note" private field.(ÕğÌâúÿÿÿÿ8±çÇŠ1
+J
+java:S1068."-Remove this unused "createdAt" private field.(ˆ³Úª8±çÇŠ1
+J
+java:S10680"-Remove this unused "updatedAt" private field.(Œ÷§Ä8ØÉŠ1

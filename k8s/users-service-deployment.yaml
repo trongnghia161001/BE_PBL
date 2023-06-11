@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users-service-app
+spec:
+  selector:
+    matchLabels:
+      app: users-service-app
+  template:
+    metadata:
+      labels:
+        app: users-service-app
+    spec:
+      containers:
+        - name: users-service-app
+          image: trongnghia161001/usersservice
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 9036
+          env:
+            - name: AXONSERVER_ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  name: axonserver-config
+                  key: axon.axonserver.domain
+            - name: CONFIG_SERVER_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: config-cm
+                  key: config_url
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: mysql-cm
+                  key: hostname
+                  optional: true
+            - name: EUREKA_SERVER_ADDRESS
+              valueFrom:
+                configMapKeyRef:
+                  name: eureka-cm
+                  key: eureka_service_address
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: users-service-svc
+spec:
+  selector:
+    app: users-service-app
+  ports:
+    - port: 80
+      targetPort: 9036

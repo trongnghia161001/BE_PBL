@@ -1,0 +1,844 @@
+version: '3'
+services:
+
+
+  zookeeper:
+      image: confluentinc/cp-zookeeper:7.3.2
+      container_name: zookeeper
+      environment:
+        ZOOKEEPER_CLIENT_PORT: 2181
+        ZOOKEEPER_TICK_TIME: 2000
+  broker:
+      image: confluentinc/cp-kafka:7.3.2
+      container_name: broker
+      ports:
+        # To learn about configuring Kafka for access across networks see
+        # https://www.confluent.io/blog/kafka-client-cannot-connect-to-broker-on-aws-on-docker-etc/
+        - "9092:9092"
+      depends_on:
+        - zookeeper
+      environment:
+        KAFKA_BROKER_ID: 1
+        KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+        KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
+        KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
+        KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+        KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+        KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+  axonserver:
+    image: axoniq/axonserver
+    container_name: axonserver
+    ports:
+      - 8024:8024
+      - 8124:8124
+      - 8224:8224
+  db:
+    image: mysql:8.0.29
+    cap_add:
+      - SYS_NICE
+    restart: always
+    environment:
+      - MYSQL_DATABASE=root
+      - MYSQL_ROOT_PASSWORD=trongnghia2k1
+    ports:
+      - '3306:3306'
+
+  discoveryserver:
+    image: 'trongnghia161001/discoveryserver'
+    container_name: discoveryserver
+    ports:
+      - '8761:8761'
+  configserver:
+    image: 'trongnghia161001/configserver'
+    container_name: configserver
+    ports:
+      - '9296:9296'
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://configserver:9296/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      - discoveryserver
+  apigateway:
+    image: 'trongnghia161001/apigateway'
+    container_name: apigateway
+    ports:
+      - '8999:8999'
+    environment:
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - configserver
+
+  commonservice:
+    image: 'trongnghia161001/commonservice'
+    container_name: commonservice
+    ports:
+      - '9051:9051'
+    environment:
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - discoveryserver
+      - configserver
+
+  usersservice:
+    image: 'trongnghia161001/usersservice'
+    container_name: usersservice
+    ports:
+      - '9036:9036'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - broker
+      - zookeeper
+      - db
+      - commonservice
+
+  addressservice:
+    image: 'trongnghia161001/addressservice'
+    container_name: addressservice
+    ports:
+      - '9039:9039'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+      - commonservice
+
+  provinceservice:
+    image: 'trongnghia161001/provinceservice'
+    container_name: provinceservice
+    ports:
+      - '9025:9025'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+      - commonservice
+
+  admin:
+    image: 'trongnghia161001/adminsservice'
+    container_name: adminsservice
+    ports:
+      - '9000:9000'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+
+  articles:
+    image: 'trongnghia161001/articlesservice'
+    container_name: articlesservice
+    ports:
+      - '9001:9001'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+
+  attributes:
+    image: 'trongnghia161001/attributesservice'
+    container_name: attributesservice
+    ports:
+      - '9002:9002'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+
+  author:
+    image: 'trongnghia161001/authorservice'
+    container_name: authorservice
+    ports:
+      - '9041:9041'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+      - commonservice
+
+  bill:
+    image: 'trongnghia161001/billservice'
+    container_name: billservice
+    ports:
+      - '9003:9003'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+      - commonservice
+
+  billpromotion:
+    image: 'trongnghia161001/billpromotionservice'
+    container_name: billpromotionservice
+    ports:
+      - '9004:9004'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+      - commonservice
+
+  billshipping:
+    image: 'trongnghia161001/billshippingservice'
+    container_name: billshippingservice
+    ports:
+      - '9005:9005'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+
+  carrier:
+    image: 'trongnghia161001/carrierservice'
+    container_name: carrierservice
+    ports:
+      - '9006:9006'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+
+  categories:
+    image: 'trongnghia161001/categoriesservice'
+    container_name: categoriesservice
+    ports:
+      - '9007:9007'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+      - commonservice
+
+  comments:
+    image: 'trongnghia161001/commentsservice'
+    container_name: commentsservice
+    ports:
+      - '9008:9008'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+
+  contacts:
+    image: 'trongnghia161001/contactsservice'
+    container_name: contactsservice
+    ports:
+      - '9009:9009'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+
+  detailbill:
+    image: 'trongnghia161001/detailbillservice'
+    container_name: detailbillservice
+    ports:
+      - '9010:9010'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+
+  events:
+    image: 'trongnghia161001/eventsservice'
+    container_name: eventsservice
+    ports:
+      - '9011:9011'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+
+  keywords:
+    image: 'trongnghia161001/keywordsservice'
+    container_name: keywordsservice
+    ports:
+      - '9012:9012'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+
+  managewarehouse:
+    image: 'trongnghia161001/managewarehouseservice'
+    container_name: managewarehouseservice
+    ports:
+      - '9013:9013'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+
+  menu:
+    image: 'trongnghia161001/menuservice'
+    container_name: menuservice
+    ports:
+      - '9014:9014'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+
+  passwordresets:
+    image: 'trongnghia161001/passwordresetsservice'
+    container_name: passwordresetsservice
+    ports:
+      - '9016:9016'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+
+  paymentmethod:
+    image: 'trongnghia161001/paymentmethodsservice'
+    container_name: paymentmethodsservice
+    ports:
+      - '9017:9017'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+
+  payments:
+    image: 'trongnghia161001/paymentsservice'
+    container_name: paymentsservice
+    ports:
+      - '9018:9018'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+      - commonservice
+
+  product:
+    image: 'trongnghia161001/productservice'
+    container_name: productservice
+    ports:
+      - '9019:9019'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+      - commonservice
+
+  productimages:
+    image: 'trongnghia161001/productimagesservice'
+    container_name: productimagesservice
+    ports:
+      - '9020:9020'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+
+  producttype:
+    image: 'trongnghia161001/producttypeservice'
+    container_name: producttypeservice
+    ports:
+      - '9042:9042'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+      - commonservice
+
+  productsattributes:
+    image: 'trongnghia161001/productsattributesservice'
+    container_name: productsattributesservice
+    ports:
+      - '9042:9042'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+
+  productskeywords:
+    image: 'trongnghia161001/productskeywordsservice'
+    container_name: productskeywordsservice
+    ports:
+      - '9022:9022'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+
+  productspromotions:
+    image: 'trongnghia161001/productspromotionsservice'
+    container_name: productspromotionsservice
+    ports:
+      - '9023:9023'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+      - commonservice
+
+  promotions:
+    image: 'trongnghia161001/promotionsservice'
+    container_name: promotionsservice
+    ports:
+      - '9024:9024'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+      - commonservice
+
+  province:
+    image: 'trongnghia161001/provinceservice'
+    container_name: provinceservice
+    ports:
+      - '9025:9025'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+      - commonservice
+
+  publisher:
+    image: 'trongnghia161001/publisherservice'
+    container_name: publisherservice
+    ports:
+      - '9032:9032'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+      - commonservice
+
+  ratings:
+    image: 'trongnghia161001/ratingsservice'
+    container_name: ratingsservice
+    ports:
+      - '9026:9026'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+
+  shipping:
+    image: 'trongnghia161001/shippingservice'
+    container_name: shippingservice
+    ports:
+      - '9027:9027'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+      - commonservice
+
+  shippingmethod:
+    image: 'trongnghia161001/shippingmethodservice'
+    container_name: shippingmethodservice
+    ports:
+      - '9028:9028'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+
+  shippingpromotion:
+    image: 'trongnghia161001/shippingpromotionservice'
+    container_name: shippingpromotionservice
+    ports:
+      - '9029:9029'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+
+  shoppingcart:
+    image: 'trongnghia161001/shoppingcartservice'
+    container_name: shoppingcartservice
+    ports:
+      - '9038:9038'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+      - commonservice
+
+  slides:
+    image: 'trongnghia161001/slidesservice'
+    container_name: slidesservice
+    ports:
+      - '9030:9030'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+
+  statics:
+    image: 'trongnghia161001/staticsservice'
+    container_name: staticsservice
+    ports:
+      - '9031:9031'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+
+  userfavourite:
+    image: 'trongnghia161001/userfavouriteservice'
+    container_name: userfavouriteservice
+    ports:
+      - '9033:9033'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+
+  userpromotion:
+    image: 'trongnghia161001/userpromotionservice'
+    container_name: userpromotionservice
+    ports:
+      - '9035:9035'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+
+  users:
+    image: 'trongnghia161001/usersservice'
+    container_name: usersservice
+    ports:
+      - '9036:9036'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+      - commonservice
+
+  warehouse:
+    image: 'trongnghia161001/warehouseservice'
+    container_name: warehouseservice
+    ports:
+      - '9037:9037'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+
+  historytransaction:
+    image: 'trongnghia161001/historytransactionservice'
+    container_name: historytransactionservice
+    ports:
+      - '9045:9045'
+    environment:
+      - AXON_SERVER_HOST=axonserver
+      - AXON_SERVER_PORT=8024
+      - EUREKA_SERVER_ADDRESS=http://discoveryserver:8761/eureka
+      - CONFIG_SERVER_URL=configserver
+    depends_on:
+      - axonserver
+      - discoveryserver
+      - configserver
+      - apigateway
+      - db
+      - commonservice
+
+
+
+
+
+
+
+
+
+

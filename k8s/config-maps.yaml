@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-cm
+data:
+  config_url: "http://config-server-svc"
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: eureka-cm
+data:
+  eureka_service_address: "http://eureka-0.eureka:8761/eureka"
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-cm
+data:
+  hostname: "mysql-0.mysql"
+
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: axonserver-config
+data:
+  axon.axonserver.domain: axonserver.default.svc.cluster.local
+  axon.axonserver.name: my-axon-server
+  axon.axonserver.hostname: axonserver
+  axon.axonserver.port: "8124"
+  axon.axonserver.token: my-access-token
